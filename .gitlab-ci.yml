@@ -1,0 +1,78 @@
+stages:
+  - validate
+  - build
+  - deploy
+
+variables:
+  PROJECT_NAME: "carcenter-api"
+  PROJECT_NAME_TEST: "carcenter-api-test"
+  GOOGLE_PROJECT_NAME: "digammastudio-cloud"
+
+validate-commit-title:
+  image: node:14.19.3-alpine
+  stage: validate
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+  script:
+    - echo "$CI_MERGE_REQUEST_TITLE" | npx commitlint || { echo 'Commitlint failed, please review the Merge Request title and retry this pipeline' ; exit 1; }
+
+
+building-test:
+  image: google/cloud-sdk:latest
+  stage: build
+  only:
+    - test
+  before_script:
+    - echo $GCP_SERVICE_KEY > ./gcloud-api-key.json
+    - gcloud auth activate-service-account --key-file gcloud-api-key.json
+    - echo "Autenticado con Google."
+    - gcloud config set project $GOOGLE_PROJECT_NAME
+  script:
+    - gcloud builds submit --tag gcr.io/$GOOGLE_PROJECT_NAME/$PROJECT_NAME_TEST
+    - echo "Termino de compilar."
+  interruptible: true
+
+deploying-test:
+  image: google/cloud-sdk:latest
+  stage: deploy
+  only:
+    - test
+  before_script:
+    - echo $GCP_SERVICE_KEY > ./gcloud-api-key.json
+    - gcloud auth activate-service-account --key-file gcloud-api-key.json
+    - gcloud config set project $GOOGLE_PROJECT_NAME
+  script:
+    - gcloud run deploy $PROJECT_NAME_TEST --image=gcr.io/$GOOGLE_PROJECT_NAME/$PROJECT_NAME_TEST --platform=managed --region=us-east4 --allow-unauthenticated
+    - echo "Termino de publicar."
+  interruptible: true
+
+building:
+  image: google/cloud-sdk:latest
+  stage: build
+  only:
+    - main
+  before_script:
+    - echo $GCP_SERVICE_KEY > ./gcloud-api-key.json
+    - gcloud auth activate-service-account --key-file gcloud-api-key.json
+    - echo "Autenticado con Google."
+    - gcloud config set project $GOOGLE_PROJECT_NAME
+  script:
+    - gcloud builds submit --tag gcr.io/$GOOGLE_PROJECT_NAME/$PROJECT_NAME
+    - echo "Termino de compilar."
+  interruptible: true
+
+deploying:
+  image: google/cloud-sdk:latest
+  stage: deploy
+  only:
+    - main
+  before_script:
+    - echo $GCP_SERVICE_KEY > ./gcloud-api-key.json
+    - gcloud auth activate-service-account --key-file gcloud-api-key.json
+    - gcloud config set project $GOOGLE_PROJECT_NAME
+  script:
+    - gcloud run deploy $PROJECT_NAME --image=gcr.io/$GOOGLE_PROJECT_NAME/$PROJECT_NAME --platform=managed --region=us-east4 --allow-unauthenticated
+    - echo "Termino de publicar."
+  interruptible: true
