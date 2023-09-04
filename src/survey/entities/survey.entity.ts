@@ -2,11 +2,11 @@ import { CoreEntity } from '../../common/entities/core.entity';
 import { Entity, Column } from 'typeorm';
 
 export enum BuyingFactors {
-  BRAND = 'La reputación de la marca',
-  FUNDING = 'Las opciones de financiamiento',
-  PERFORMANCE = 'El desempeño al manejarlo',
-  RECOMMENDATIONS = 'Recomendaciones de amigos o familiares',
-  OTHER = 'Otros'
+  BRAND = 'BRAND',
+  FUNDING = 'FUNDING',
+  PERFORMANCE = 'PERFORMANCE',
+  RECOMMENDATIONS = 'RECOMMENDATIONS',
+  OTHER = 'OTHER',
 }
 
 

@@ -2,14 +2,15 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { SurveyService } from './survey.service';
 import { CreateSurveyDto } from './dto/create-survey.dto';
 import { UpdateSurveyDto } from './dto/update-survey.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('survey')
 export class SurveyController {
   constructor(private readonly surveyService: SurveyService) {}
 
   @Post()
+  @Public()
   create(@Body() createSurveyDto: CreateSurveyDto) {
-    console.log(createSurveyDto)
     return this.surveyService.create(createSurveyDto);
   }
 

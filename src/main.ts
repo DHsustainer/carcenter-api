@@ -8,10 +8,10 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
-    .setTitle('Mindlight API')
-    .setDescription('The Mindlight API documentation')
+    .setTitle('Car Center API')
+    .setDescription('The Car Center API documentation')
     .setVersion('1.0')
-    .addTag('mindlight')
+    .addTag('carcenter')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);

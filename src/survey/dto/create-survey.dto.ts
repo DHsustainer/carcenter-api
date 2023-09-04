@@ -19,7 +19,7 @@ export class CreateSurveyDto {
   carModel: string;
 
   @ApiProperty({
-    example: 'Brand of the car',
+    example: 'BRAND',
     description: 'Buying factors',
   })
   @IsString()
